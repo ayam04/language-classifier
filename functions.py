@@ -49,6 +49,8 @@ def classify_video(transcript):
         "Pronunciation and Accent": "96%",
         "Comprehension and Responsiveness": "40%"
     }}
+    This is just the format of the json. Do not send the above json as the response, unless you want to provide the same ratings for the candidate.
+    Update the scores in the json response above with the ratings you want to provide for the candidate but do not remove the percentage sign.
     """
     response = llm(prompt).replace(prompt, "").replace("\n", "").strip()
 
