@@ -17,14 +17,12 @@ model = whisper.load_model("base")
 llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.3", model_kwargs={"temperature": 0.5, "max_new_tokens": 30000})
 
 def transcribe_video(video_input):
-    filename = os.path.basename(video_input)
     audio_output = "audio.mp3"
     ffmpeg_command = f"ffmpeg -i {video_input} -vn -c:a libmp3lame -b:a 192k {audio_output}"
     subprocess.run(ffmpeg_command, shell=True, check=True)
     response = model.transcribe(audio_output)  
     os.remove(audio_output)
-    with open(f"Transcripts/{filename}.txt", "x") as f:
-        f.write(response["text"])
+    return response["text"].strip()
 
 def classify_video(transcript):
     prompt = f"""
@@ -44,12 +42,12 @@ def classify_video(transcript):
 
     Make sure that your output is a json response of the following format without any additional text or characters and no multiple lines. The response should be a single line of json. The response should be in the following format:
     {{
-        "Overall Performance": 90,
-        "Fluency": 88,
-        "Grammar and Syntax": 97,
-        "Vocabulary and Word Choice": 59,
-        "Pronunciation and Accent": 96,
-        "Comprehension and Responsiveness": 40
+        "Overall Performance": "90%",
+        "Fluency": "88%",
+        "Grammar and Syntax": "97%",
+        "Vocabulary and Word Choice": "59%",
+        "Pronunciation and Accent": "96%",
+        "Comprehension and Responsiveness": "40%"
     }}
     """
     response = llm(prompt).replace(prompt, "").replace("\n", "").strip()
@@ -66,13 +64,9 @@ def classify_video(transcript):
             print(f"Secondary JSON decode error: {e}")
             raise
 
-    with open("result.json", "w", encoding="utf-8") as f:
-        json.dump(json_response, f, indent=4)
+    return json_response
     
+# video_input = "Videos/video.mp4"
 
-video_input = "Videos/video.mp4"
-
-transcribe_video(video_input)
-with open("Transcripts/video.mp4.txt", "r") as f:
-    transcript = f.read()
-    classify_video(transcript)
+# transcript = transcribe_video(video_input)
+# classify_video(transcript)
