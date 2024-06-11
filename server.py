@@ -22,4 +22,4 @@ async def main(video_input: UploadFile = File(...)):
         return {"error": str(e)}
 
 if __name__ == "__main__":
-    uvicorn.run(app, port=8080, reload=True)
+    uvicorn.run(app, port=8080)
