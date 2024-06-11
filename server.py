@@ -1,8 +1,8 @@
-import uvicorn
-from fastapi import FastAPI, File, UploadFile
-from functions import *
 import os
+import uvicorn
 import tempfile
+from functions import *
+from fastapi import FastAPI, File, UploadFile
 
 app = FastAPI()
 
