@@ -26,9 +26,9 @@ def transcribe_video(video_input):
 
 def classify_video(transcript):
     prompt = f"""
-    You are a professional English teacher. You are presented with a transcript of a candidate's interview for any role in general. You are supposed to catgeorize the candidate's overall performance on a scale of 1 to 100 Percent.
+    You are a professional English teacher. You are presented with a transcript of a candidate's interview for any role in general. You are supposed to catgeorize the candidate's overall performance on a scale of 1 to 10.
     
-    You are also expected to rate the candidate on these metrics on the scale of 1 to 100:
+    You are also expected to rate the candidate on these metrics on the scale of 1 to 10:
     
     1. Fluency: How well the candidate speaks English.
     2. Grammar and Syntax: How well the candidate uses correct grammar and sentence structure.
@@ -42,15 +42,15 @@ def classify_video(transcript):
 
     Make sure that your output is a json response of the following format without any additional text or characters and no multiple lines. The response should be a single line of json. The response should be in the following format:
     {{
-        "Overall Performance": "90%",
-        "Fluency": "88%",
-        "Grammar and Syntax": "97%",
-        "Vocabulary and Word Choice": "59%",
-        "Pronunciation and Accent": "96%",
-        "Comprehension and Responsiveness": "40%"
+        "Overall Performance": 5,
+        "Fluency": 6,
+        "Grammar and Syntax": 5,
+        "Vocabulary and Word Choice": 1,
+        "Pronunciation and Accent": 10,
+        "Comprehension and Responsiveness": 8
     }}
     This is just the format of the json. Do not send the above json as the response, unless you want to provide the same ratings for the candidate.
-    Update the scores in the json response above with the ratings you want to provide for the candidate but do not remove the percentage sign.
+    Update the scores in the json response above with the ratings you want to provide for the candidate.
     """
     response = llm(prompt).replace(prompt, "").replace("\n", "").strip()
 
