@@ -20,6 +20,7 @@ model = whisper.load_model("base")
 llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.3", model_kwargs={"temperature": 0.5, "max_new_tokens": 30000})
 
 def transcribe_video(video_input):
+    filename = os.path.basename(video_input).split(".")[0]
     audio_output = "audio.wav"
     ffmpeg_command = f"ffmpeg -i {video_input} -vn -c:a libmp3lame -b:a 192k {audio_output}"
     subprocess.run(ffmpeg_command, shell=True, check=True)
@@ -28,6 +29,9 @@ def transcribe_video(video_input):
     response = model.transcribe(audio_output)  
     os.remove(audio_output)
     
+    with open(f"{filename}.txt", "x") as f:
+        f.write(response["text"].strip())
+
     total_confidence = 0
     total_length = 0
     
@@ -42,6 +46,7 @@ def transcribe_video(video_input):
         return 0
     
     average_confidence = total_confidence / total_length
+
     return (f"{average_confidence*10:.0f}", response["text"].strip())
 
 def classify_video(conf_transcript):
