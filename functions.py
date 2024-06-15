@@ -1,5 +1,7 @@
 import os
+import re
 import json
+import time
 import whisper
 import warnings
 import subprocess
@@ -11,6 +13,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
+start = time.time()
 
 load_dotenv()
 
@@ -68,20 +71,16 @@ def classify_video(conf_transcript):
     Make sure to not explain anything in your response. Just provide the ratings and the category.
 
     Make sure that your output is a json response of the following format without any additional text or characters and no multiple lines. The response should be a single line of json. The response should be in the following format:
-    {{
-        "Overall Performance": 5,
-        "Fluency": 6,
-        "Grammar and Syntax": 5,
-        "Vocabulary and Word Choice": 1,
-        "Pronunciation and Accent": 0,
-        "Comprehension and Responsiveness": 8
-    }}
+    {{"Overall Performance": 5, "Fluency": 6, "Grammar and Syntax": 5 ,"Vocabulary and Word Choice": 1, "Pronunciation and Accent": 0, "Comprehension and Responsiveness": 8}}
     This is just the format of the json. Do not send the above json as the response, unless you want to provide the same ratings for the candidate.
+    You response should be a single line json.
     Update the scores in the json response above with the ratings you want to provide for the candidate.
     """
     
     response = llm(prompt).replace(prompt, "").replace("\n", "").strip()
-    
+    response = re.sub(r'^.*?({.*?}).*$', r'\1', response)
+
+    print(response)
     try:
         json_response = json.loads(response)
     except json.JSONDecodeError as e:
@@ -95,10 +94,11 @@ def classify_video(conf_transcript):
             raise
 
     json_response["Pronunciation and Accent"] = conf
-
+    end = time.time()
+    print(f"Time taken: {end - start}")
     return json_response
-    
-# video_input = "Videos/video.mp4"
+
+video_input = "Videos/video.mp4"
 
 # transcript = transcribe_video(video_input)
 # print(transcript)

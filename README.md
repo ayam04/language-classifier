@@ -55,7 +55,7 @@ The English Language Classifier is a FastAPI-based application that allows users
 
 ### Endpoint
 
-`POST /classify-english`
+`POST /english-communication`
 
 ### Request
 
