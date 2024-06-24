@@ -20,7 +20,7 @@ load_dotenv()
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.getenv("HF_API_KEY")
 
 model = whisper.load_model("base")
-llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.2", model_kwargs={"temperature": 0.5, "max_new_tokens": 30000})
+llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.2", model_kwargs={"temperature": 0.5, "max_new_tokens": 25000})
 
 def transcribe_video(video_input):
     filename = os.path.basename(video_input).split(".")[0]
@@ -56,7 +56,7 @@ def classify_video(conf_transcript):
     conf, transcript = conf_transcript
     conf = int(conf)
     prompt = f"""
-    You are a professional English teacher. You are presented with a transcript of a candidate's interview for any role in general. You are supposed to categorize the candidate's overall performance on a scale of 1 to 10, while also providing a 1 line reason of why the score has been given.
+    You are a professional English teacher. You are presented with a transcript of a candidate's interview for any role in general. You are supposed to categorize the candidate's overall performance on a scale of 1 to 10, while also providing a 1 line reason of why the score has been given. The overall performance's reason should be detailed and should cover all aspects of the candidate's performance in 3 lines.
     
     You are also expected to rate the candidate on these metrics on the scale of 1 to 10:
     
