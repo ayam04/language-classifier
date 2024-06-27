@@ -22,15 +22,10 @@ os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.getenv("HF_API_KEY")
 model = whisper.load_model("base")
 llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.2", model_kwargs={"temperature": 0.5, "max_new_tokens": 25000})
 
-def transcribe_video(video_input):
-    filename = os.path.basename(video_input).split(".")[0]
-    audio_output = "audio.wav"
-    ffmpeg_command = f"ffmpeg -i {video_input} -vn -c:a libmp3lame -b:a 192k {audio_output}"
-    subprocess.run(ffmpeg_command, shell=True, check=True)
-    
+def transcribe_video(audio_input):
+    filename = os.path.basename(audio_input).split(".")[0]
     model = whisper.load_model("base")
-    response = model.transcribe(audio_output)  
-    os.remove(audio_output)
+    response = model.transcribe(audio_input)
     
     with open(f"{filename}.txt", "x") as f:
         f.write(response["text"].strip())
