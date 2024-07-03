@@ -73,11 +73,12 @@ def classify_video(conf_transcript):
     Make sure to not explain anything in your response, except for the 1 line description of why the score has been given. Just provide the ratings, reason and the category.
 
     Make sure that your output is a json response of the following format without any additional text or characters and no multiple lines. The response should be a single line of json. The response should be in the following format:
-    
+
     {{"Overall Performance": [5,"The candidate spoke clearly and effectively about their professional experiences."], "Fluency": [6,"The candidate had clear fluency throught the interview"], "Grammar and Syntax": [5,"Minor errors in sentence structure."] ,"Vocabulary and Word Choice": [5,"Used some advanced vocabulary but could benefit from more varied word choice."], "Pronunciation and Accent": [9,"The candidate had very clear pronunciation"], "Comprehension and Responsiveness": [8,"The candidate demonstrated a good understanding of the questions and provided clear and concise responses."]}}
 
     This is just the format of the json. Do not send the above json as the response, unless you want to provide the same ratings or reasons for the candidate.
     Update the string values in the json above with the ratings you want to provide for the candidate.
+    The responses for individual categories should be atleast 10 to 15 words.
     Update the scores in the json response above with the ratings you want to provide for the candidate.
     You response should be a single line json.
     """
