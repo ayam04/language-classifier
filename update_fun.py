@@ -4,7 +4,6 @@ import json
 import time
 import whisper
 import warnings
-import subprocess
 import numpy as np
 from dotenv import load_dotenv
 from langchain_community.llms.huggingface_hub import HuggingFaceHub
@@ -19,7 +18,7 @@ load_dotenv()
 
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.getenv("HF_API_KEY")
 
-model = whisper.load_model("base")
+model = whisper.load_model("base") # ["tiny","base","medium","large"]
 llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.2", model_kwargs={"temperature": 0.5, "max_new_tokens": 25000})
 
 def transcribe_video(audio_input):
