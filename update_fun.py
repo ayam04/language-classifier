@@ -44,8 +44,9 @@ def transcribe_video(audio_input):
         return 0
     
     average_confidence = total_confidence / total_length
-
-    return (f"{average_confidence*10:.0f}", response["text"].strip())
+    transcript = response["text"].strip()
+    
+    return (f"{average_confidence*10:.0f}", transcript)
 
 def classify_video(conf_transcript):
     conf, transcript = conf_transcript
@@ -93,8 +94,6 @@ def classify_video(conf_transcript):
     end = time.time()
     print(f"Time taken: {end - start}")
     return json_response
-
-video_input = "Videos/video.mp4"
 
 # transcript = transcribe_video(video_input)
 # print(transcript)
