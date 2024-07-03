@@ -65,12 +65,30 @@ Upload a video file in the request body.
 
 ```json
 {
-  "Overall Performance": "90%",
-  "Fluency": "88%",
-  "Grammar and Syntax": "97%",
-  "Vocabulary and Word Choice": "59%",
-  "Pronunciation and Accent": "96%",
-  "Comprehension and Responsiveness": "40%"
+  "Overall Performance": [
+    7,
+    "The candidate had a good understanding of the topics discussed and communicated effectively."
+  ],
+  "Fluency": [
+    8,
+    "The candidate spoke clearly and effectively with only minor pauses and hesitations."
+  ],
+  "Grammar and Syntax": [
+    7,
+    "The candidate had some errors in sentence structure and word usage."
+  ],
+  "Vocabulary and Word Choice": [
+    6,
+    "The candidate used a limited vocabulary and could benefit from expanding their word choice."
+  ],
+  "Pronunciation and Accent": [
+    7,
+    "The candidate had very clear pronunciation"
+  ],
+  "Comprehension and Responsiveness": [
+    9,
+    "The candidate demonstrated a strong understanding of the questions and provided detailed and accurate responses."
+  ]
 }
 ```
 
