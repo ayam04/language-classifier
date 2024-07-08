@@ -4,3 +4,4 @@ langchain_community==0.2.4
 python-dotenv==1.0.1
 uvicorn==0.22.0
 huggingface_hub==0.20.3
+whisperx

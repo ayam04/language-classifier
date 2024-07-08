@@ -1,21 +1,15 @@
-import os
 import uvicorn
-import tempfile
 from functions import *
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI
 
 app = FastAPI()
 
 @app.post("/communication-score")
-async def main(video_input: UploadFile = File(...)):
+async def main(cand_id: str):
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_file:
-            temp_file.write(await video_input.read())
-            temp_file_path = temp_file.name
-        
-        transcript = transcribe_video(temp_file_path)
+        video_output_path = process_candidate_videos(cand_id)
+        transcript = transcribe_video(video_output_path)
         response = classify_video(transcript)
-        os.remove(temp_file_path)
         return response
     
     except Exception as e:

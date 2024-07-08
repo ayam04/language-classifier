@@ -21,21 +21,62 @@ load_dotenv()
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.getenv("HF_API_KEY")
 os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
 os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
-os.environ["AWS_REGION"] = os.getenv("AWS_REGION")
+region_name = os.getenv("AWS_REGION")
+bucket_name = os.getenv("BUCKET_NAME")
 
+s3 = boto3.client('s3', region_name=region_name)
+# model = whisper.load_model("base", device="cuda", compute_type="int8")
 model = whisper.load_model("base")
 llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.2", model_kwargs={"temperature": 0.5, "max_new_tokens": 25000})
 
+def list_videos_for_candidate(bucket_name, candidate_assessment_id):
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=f"recording-new/{candidate_assessment_id}")
+    # print(response)
+    return [content['Key'] for content in response.get('Contents', [])]
+
 def download_video_from_s3(bucket_name, video_key, download_path):
-    s3 = boto3.client('s3', region_name=os.getenv("AWS_REGION"))
-    s3.download_file(bucket_name, video_key, download_path)
+    try:
+        s3.download_file(bucket_name, video_key, download_path)
+    except Exception as e:
+        print(f"Error downloading video from S3: {e}")
+        pass
+
+def concatenate_videos(video_paths, output_path):
+    with open("filelist.txt", "w") as f:
+        for video in video_paths:
+            f.write(f"file './{video}'\n")
+
+    ffmpeg_command = f"ffmpeg -f concat -safe 0 -i filelist.txt -c copy {output_path}"
+    # print(f"Executing FFmpeg command: {ffmpeg_command}")
+    subprocess.run(ffmpeg_command, shell=True, check=True)
+
+    os.remove("filelist.txt")
+    for video_path in video_paths:
+        os.remove(video_path)
+
+def process_candidate_videos(candidate_assessment_id):
+    video_output_path = f"{candidate_assessment_id}_video.mp4"
+
+    video_files = list_videos_for_candidate(bucket_name, candidate_assessment_id)
+    print(f"Found videos: {video_files}")
+
+    downloaded_videos = []
+    for video_file in video_files:
+        download_path = f"Videos/{os.path.basename(video_file)}"
+        download_video_from_s3(bucket_name, video_file, download_path)
+        downloaded_videos.append(download_path)
+
+    concatenate_videos(downloaded_videos, video_output_path)
+    print(f"Videos concatenated and saved to {video_output_path}")
+    return video_output_path
 
 def transcribe_video(video_input):
     audio_output = "audio.wav"
     ffmpeg_command = f"ffmpeg -i {video_input} -vn -c:a libmp3lame -b:a 192k {audio_output}"
     subprocess.run(ffmpeg_command, shell=True, check=True)
+    os.remove(video_input)
     
-    model = whisper.load_model("base")
+    # audio = whisperx.load_audio(audio_output)
     response = model.transcribe(audio_output)  
     os.remove(audio_output)
 
@@ -106,11 +147,9 @@ def classify_video(conf_transcript):
     print(f"Time taken: {end - start}")
     return json_response
 
-bucket_name = "bucket name"
-video_key = "video.mp4"
-download_path = "Videos/video.mp4"
-
-# download_video_from_s3(bucket_name, video_key, download_path)
-# transcript = transcribe_video(download_path)
-# print(transcript)
-# print(classify_video(transcript))
+# Usage
+candidate_id = "662f486dafd2bf001c8d56f1"
+video_output_path = process_candidate_videos(candidate_id)
+transcript = transcribe_video(video_output_path)
+print(transcript)
+print(classify_video(transcript))
