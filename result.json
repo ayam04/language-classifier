@@ -1,8 +1,26 @@
 {
-  "Overall Performance": 6,
-  "Fluency": 7,
-  "Grammar and Syntax": 6,
-  "Vocabulary and Word Choice": 3,
-  "Pronunciation and Accent": 6,
-  "Comprehension and Responsiveness": 8
+  "Overall Performance": [
+    7,
+    "The candidate had a good understanding of the topics discussed and communicated effectively."
+  ],
+  "Fluency": [
+    8,
+    "The candidate spoke clearly and effectively with only minor pauses and hesitations."
+  ],
+  "Grammar and Syntax": [
+    7,
+    "The candidate had some errors in sentence structure and word usage."
+  ],
+  "Vocabulary and Word Choice": [
+    6,
+    "The candidate used a limited vocabulary and could benefit from expanding their word choice."
+  ],
+  "Pronunciation and Accent": [
+    7,
+    "The candidate had very clear pronunciation"
+  ],
+  "Comprehension and Responsiveness": [
+    9,
+    "The candidate demonstrated a strong understanding of the questions and provided detailed and accurate responses."
+  ]
 }

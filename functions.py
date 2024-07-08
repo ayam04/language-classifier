@@ -6,6 +6,7 @@ import whisper
 import warnings
 import subprocess
 import numpy as np
+import boto3
 from dotenv import load_dotenv
 from langchain_community.llms.huggingface_hub import HuggingFaceHub
 
@@ -18,9 +19,16 @@ start = time.time()
 load_dotenv()
 
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = os.getenv("HF_API_KEY")
+os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
+os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
+os.environ["AWS_REGION"] = os.getenv("AWS_REGION")
 
 model = whisper.load_model("base")
 llm = HuggingFaceHub(repo_id="mistralai/Mistral-7B-Instruct-v0.2", model_kwargs={"temperature": 0.5, "max_new_tokens": 25000})
+
+def download_video_from_s3(bucket_name, video_key, download_path):
+    s3 = boto3.client('s3', region_name=os.getenv("AWS_REGION"))
+    s3.download_file(bucket_name, video_key, download_path)
 
 def transcribe_video(video_input):
     audio_output = "audio.wav"
@@ -30,10 +38,6 @@ def transcribe_video(video_input):
     model = whisper.load_model("base")
     response = model.transcribe(audio_output)  
     os.remove(audio_output)
-    
-    # filename = os.path.basename(video_input).split(".")[0]
-    # with open(f"{filename}.txt", "x") as f:
-    #     f.write(response["text"].strip())
 
     total_confidence = 0
     total_length = 0
@@ -49,7 +53,6 @@ def transcribe_video(video_input):
         return 0
     
     average_confidence = total_confidence / total_length
-    # print(response)
     return (f"{average_confidence*10:.0f}", response["text"].strip())
 
 def classify_video(conf_transcript):
@@ -58,7 +61,7 @@ def classify_video(conf_transcript):
     prompt = f"""
     You are a professional English teacher. You are presented with a transcript of a candidate's interview for any role in general. You are supposed to categorize the candidate's overall performance on a scale of 1 to 10, while also providing a 1 line reason of why the score has been given. The overall performance's reason should be detailed and should cover all aspects of the candidate's performance in 30 words.
     
-    The pronuncation, accent and fluency based confidence score is {conf}.
+    The pronunciation, accent and fluency based confidence score is {conf}.
     
     You are also expected to rate the candidate on these metrics on the scale of 1 to 10:
     
@@ -74,19 +77,18 @@ def classify_video(conf_transcript):
 
     Make sure that your output is a json response of the following format without any additional text or characters and no multiple lines. The response should be a single line of json. The response should be in the following format:
 
-    {{"Overall Performance": [5,"The candidate spoke clearly and effectively about their professional experiences."], "Fluency": [6,"The candidate had clear fluency throught the interview"], "Grammar and Syntax": [5,"Minor errors in sentence structure."] ,"Vocabulary and Word Choice": [5,"Used some advanced vocabulary but could benefit from more varied word choice."], "Pronunciation and Accent": [9,"The candidate had very clear pronunciation"], "Comprehension and Responsiveness": [8,"The candidate demonstrated a good understanding of the questions and provided clear and concise responses."]}}
+    {{"Overall Performance": [5,"The candidate spoke clearly and effectively about their professional experiences."], "Fluency": [6,"The candidate had clear fluency throught the interview"], "Grammar and Syntax": [5,"Minor errors in sentence structure."],"Vocabulary and Word Choice": [5,"Used some advanced vocabulary but could benefit from more varied word choice."], "Pronunciation and Accent": [9,"The candidate had very clear pronunciation"], "Comprehension and Responsiveness": [8,"The candidate demonstrated a good understanding of the questions and provided clear and concise responses."]}}
 
     This is just the format of the json. Do not send the above json as the response, unless you want to provide the same ratings or reasons for the candidate.
     Update the string values in the json above with the ratings you want to provide for the candidate.
-    The responses for individual categories should be atleast 10 to 15 words.
+    The responses for individual categories should be at least 10 to 15 words.
     Update the scores in the json response above with the ratings you want to provide for the candidate.
-    You response should be a single line json.
+    Your response should be a single line json.
     """
     
     response = llm(prompt).replace(prompt, "").replace("\n", "").strip()
     response = re.sub(r'^.*?({.*?}).*$', r'\1', response)
 
-    # print(response)
     try:
         json_response = json.loads(response)
     except json.JSONDecodeError as e:
@@ -104,8 +106,11 @@ def classify_video(conf_transcript):
     print(f"Time taken: {end - start}")
     return json_response
 
-video_input = "Videos/video.mp4"
+bucket_name = "bucket name"
+video_key = "video.mp4"
+download_path = "Videos/video.mp4"
 
-# transcript = transcribe_video(video_input)
+# download_video_from_s3(bucket_name, video_key, download_path)
+# transcript = transcribe_video(download_path)
 # print(transcript)
 # print(classify_video(transcript))

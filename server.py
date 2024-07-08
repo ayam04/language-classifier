@@ -6,7 +6,7 @@ from fastapi import FastAPI, File, UploadFile
 
 app = FastAPI()
 
-@app.post("/english-communication")
+@app.post("/communication-score")
 async def main(video_input: UploadFile = File(...)):
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_file:
