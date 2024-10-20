@@ -23,8 +23,8 @@ The English Language Classifier is a FastAPI-based application that allows users
 
 1. Clone the repository:
     ```bash
-    git clone <repository_url>
-    cd <repository_directory>
+    git clone [<repository_url>](https://github.com/ayam04/language-classifier)
+    cd language-classifier
     ```
 
 2. Install the required Python packages:
